@@ -12,8 +12,8 @@ export default new Vuex.Store({
     product: {},
   },
   mutations: {
-    SET_PRODUCTS: (state, payload) => {
-      state.products = payload.data;
+    SET_PRODUCTS: (state, products) => {
+      state.products = products.data;
     },
     SET_PRODUCT: (state, product) => {
       state.product = product.data;
@@ -27,7 +27,7 @@ export default new Vuex.Store({
     },
     EDIT_PRODUCT: (state, editedProduct) => {
       const index = state.products.findIndex(x => x.id === editedProduct.id);
-      Object.assign(state.products[index], editedProduct.item);
+      Object.assign(state.products[index], editedProduct);
     },
   },
   actions: {
@@ -48,7 +48,7 @@ export default new Vuex.Store({
       commit('ADD_PRODUCT', newProduct);
     },
     EDIT_PRODUCT: async ({ commit }, editedProduct) => {
-      await axios.put(url + editedProduct.id, editedProduct.item);
+      await axios.put(url + editedProduct.id, editedProduct);
       commit('EDIT_PRODUCT', editedProduct);
     },
   },
