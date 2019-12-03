@@ -4,7 +4,7 @@ import axios from 'axios';
 
 Vue.use(Vuex);
 
-const url = 'http://test-app.viktor.ws/api/products/';
+const url = 'https://test-app.viktor.ws/api/products/';
 
 export default new Vuex.Store({
   state: {
