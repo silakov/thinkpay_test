@@ -58,13 +58,13 @@
                   </v-col>
                 </v-row>
               </v-container>
-              {{ errors.name }}
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDialog">Cancel</v-btn>
               <v-btn
                 color="blue darken-1"
+                :disabled="$v.$invalid"
                 text
                 @click="saveProduct"
               >
@@ -147,7 +147,6 @@ export default {
   computed: {
     ...mapState([
       'products',
-      'errors',
     ]),
     formTitle() {
       return this.editedProduct.id > -1 ? 'Edit Item' : 'New Item';
@@ -193,7 +192,6 @@ export default {
     },
     closeDialog() {
       this.dialog = false;
-      this.$store.commit('SET_ERRORS', {});
       this.editedProduct = Object.assign({}, this.defaultProduct);
     },
     async saveProduct() {
@@ -202,11 +200,8 @@ export default {
       } else {
         await this.$store.dispatch('ADD_PRODUCT', this.editedProduct);
       }
-      if (!Object.keys(this.errors).length) {
-        console.log(this.errors);
-      } else {
-        console.log(this.errors);
-      }
+      await this.$store.dispatch('GET_PRODUCTS');
+      this.closeDialog();
     },
   },
 };

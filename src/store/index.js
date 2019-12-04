@@ -8,14 +8,10 @@ const url = 'https://test-app.viktor.ws/api/products/';
 
 export default new Vuex.Store({
   state: {
-    errors: {},
     products: [],
     product: {},
   },
   mutations: {
-    SET_ERRORS: (state, errors) => {
-      state.errors = errors;
-    },
     SET_PRODUCTS: (state, products) => {
       state.products = products.data;
     },
@@ -48,24 +44,12 @@ export default new Vuex.Store({
       commit('DELETE_PRODUCT', removedProductId);
     },
     ADD_PRODUCT: async ({ commit }, newProduct) => {
-      await axios.post(url, newProduct)
-        .then(() => {
-          commit('ADD_PRODUCT', newProduct);
-          commit('SET_ERRORS', {});
-        })
-        .catch((error) => {
-          commit('SET_ERRORS', error.response.data.errors);
-        });
+      await axios.post(url, newProduct);
+      commit('ADD_PRODUCT', newProduct);
     },
     EDIT_PRODUCT: async ({ commit }, editedProduct) => {
-      await axios.put(url + editedProduct.id, editedProduct)
-        .then(() => {
-          commit('EDIT_PRODUCT', editedProduct);
-          commit('SET_ERRORS', {});
-        })
-        .catch((error) => {
-          commit('SET_ERRORS', error.response.data.errors);
-        });
+      await axios.put(url + editedProduct.id, editedProduct);
+      commit('EDIT_PRODUCT', editedProduct);
     },
   },
 });
