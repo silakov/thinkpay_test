@@ -84,15 +84,15 @@
       hide-default-footer
     >
       <template v-slot:item.name="{ item }">
-        <router-link :to="'/product/' + item.id">{{ item.name }}</router-link>
+        <router-link :to="'/product/' + item._id">{{ item.name }}</router-link>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-btn icon @click="editProduct(item)">
+        <v-btn icon @click="editProduct(item, item._id)">
           <v-icon>
             mdi-pencil
           </v-icon>
         </v-btn>
-        <v-btn icon @click="deleteProduct(item)">
+        <v-btn icon @click="deleteProduct(item._id)">
           <v-icon>
             mdi-delete
           </v-icon>
@@ -115,6 +115,7 @@ export default {
     name: '',
     code: '',
     price: '',
+    isEdit: '',
     editedProduct: {
       name: '',
       code: null,
@@ -124,7 +125,6 @@ export default {
       name: '',
       code: null,
       price: null,
-      id: -1,
     },
   }),
   validations() {
@@ -149,7 +149,7 @@ export default {
       'products',
     ]),
     formTitle() {
-      return this.editedProduct.id > -1 ? 'Edit Item' : 'New Item';
+      return this.isEdit !== '' ? 'Edit Item' : 'New Item';
     },
     headers() {
       return [
@@ -183,20 +183,23 @@ export default {
     await this.$store.dispatch('GET_PRODUCTS');
   },
   methods: {
-    editProduct(product) {
+    editProduct(product, id) {
+      this.isEdit = id;
       this.editedProduct = Object.assign({}, product);
       this.dialog = true;
     },
     async deleteProduct(product) {
-      await this.$store.dispatch('DELETE_PRODUCT', product.id);
+      await this.$store.dispatch('DELETE_PRODUCT', product);
+      await this.$store.dispatch('GET_PRODUCTS');
     },
     closeDialog() {
       this.dialog = false;
+      this.isEdit = '';
       this.editedProduct = Object.assign({}, this.defaultProduct);
     },
     async saveProduct() {
-      if (this.editedProduct.id > -1) {
-        await this.$store.dispatch('EDIT_PRODUCT', this.editedProduct);
+      if (this.isEdit !== '') {
+        await this.$store.dispatch('EDIT_PRODUCT', { id: this.isEdit, product: this.editedProduct });
       } else {
         await this.$store.dispatch('ADD_PRODUCT', this.editedProduct);
       }

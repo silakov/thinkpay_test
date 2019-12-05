@@ -4,7 +4,9 @@ import axios from 'axios';
 
 Vue.use(Vuex);
 
-const url = 'https://test-app.viktor.ws/api/products/';
+// const url = 'https://test-app.viktor.ws/api/products/';
+const url = 'https://fathomless-escarpment-66749.herokuapp.com/products';
+// const url = 'http://localhost:5000/products/';
 
 export default new Vuex.Store({
   state: {
@@ -13,10 +15,10 @@ export default new Vuex.Store({
   },
   mutations: {
     SET_PRODUCTS: (state, products) => {
-      state.products = products.data;
+      state.products = products;
     },
     SET_PRODUCT: (state, product) => {
-      state.product = product.data;
+      state.product = product;
     },
     DELETE_PRODUCT: (state, removedProductId) => {
       const index = state.products.findIndex(x => x.id === removedProductId);
@@ -48,8 +50,8 @@ export default new Vuex.Store({
       commit('ADD_PRODUCT', newProduct);
     },
     EDIT_PRODUCT: async ({ commit }, editedProduct) => {
-      await axios.put(url + editedProduct.id, editedProduct);
-      commit('EDIT_PRODUCT', editedProduct);
+      await axios.put(url + editedProduct.id, editedProduct.product);
+      commit('EDIT_PRODUCT', editedProduct.product);
     },
   },
 });
