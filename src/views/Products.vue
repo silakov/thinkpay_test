@@ -84,7 +84,7 @@
       hide-default-footer
     >
       <template v-slot:item.name="{ item }">
-        <router-link :to="'/product/' + item._id">{{ item.name }}</router-link>
+        <router-link :to="'/product/' + item.name">{{ item.name }}</router-link>
       </template>
       <template v-slot:item.action="{ item }">
         <v-btn icon @click="editProduct(item, item._id)">
