@@ -1,16 +1,13 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="name" type="text" label="Filter by name"></v-text-field>
       </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-text-field v-model="code" type="text" label="Filter by code"></v-text-field>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="price" type="text" label="Filter by price"></v-text-field>
       </v-col>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6" md="4">
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on }">
             <v-btn color="primary" dark class="mt-3" block v-on="on">New Item</v-btn>
@@ -84,7 +81,13 @@
       hide-default-footer
     >
       <template v-slot:item.name="{ item }">
-        <router-link :to="'/product/' + item.name">{{ item.name }}</router-link>
+        <router-link :to="'/product/' + item['_id']">{{ item.name }}</router-link>
+      </template>
+      <template v-slot:item.created_at="{ item }">
+        {{ showDate(item.created_at) }}
+      </template>
+      <template v-slot:item.updated_at="{ item }">
+        {{ showDate(item.updated_at) }}
       </template>
       <template v-slot:item.action="{ item }">
         <v-btn icon @click="editProduct(item, item._id)">
@@ -114,16 +117,16 @@ export default {
     dialog: false,
     name: '',
     code: '',
-    price: '',
+    price: null,
     isEdit: '',
     editedProduct: {
       name: '',
-      code: null,
+      code: '',
       price: null,
     },
     defaultProduct: {
       name: '',
-      code: null,
+      code: '',
       price: null,
     },
   }),
@@ -153,7 +156,10 @@ export default {
     },
     headers() {
       return [
-        { text: 'Name', value: 'name' },
+        {
+          text: 'Name',
+          value: 'name',
+        },
         {
           text: 'Code',
           value: 'code',
@@ -165,10 +171,14 @@ export default {
         {
           text: 'Price',
           value: 'price',
-          filter: (value) => {
-            if (!this.price) return true;
-            return value === parseInt(this.price, 10);
-          },
+        },
+        {
+          text: 'Created',
+          value: 'created_at',
+        },
+        {
+          text: 'Updated',
+          value: 'updated_at',
         },
         {
           text: 'Actions',
@@ -183,6 +193,17 @@ export default {
     await this.$store.dispatch('GET_PRODUCTS');
   },
   methods: {
+    showDate(date) {
+      const currentDate = new Date(date);
+      const day = currentDate.getDate();
+      const month = currentDate.toLocaleString('default', { month: 'long' }).slice(0, 3);
+      const year = currentDate.getFullYear().toString();
+      const hours = currentDate.getHours().toString().padStart(2, '0');
+      const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+      const formattedDate = `${hours}.${minutes} - ${day} ${month} ${year}`;
+
+      return formattedDate;
+    },
     editProduct(product, id) {
       this.isEdit = id;
       this.editedProduct = Object.assign({}, product);
@@ -198,10 +219,14 @@ export default {
       this.editedProduct = Object.assign({}, this.defaultProduct);
     },
     async saveProduct() {
+      const newEditedProduct = {
+        ...this.editedProduct,
+        price: Number(this.editedProduct.price), // Преобразование строки в число
+      };
       if (this.isEdit !== '') {
-        await this.$store.dispatch('EDIT_PRODUCT', { id: this.isEdit, product: this.editedProduct });
+        await this.$store.dispatch('EDIT_PRODUCT', { id: this.isEdit, product: newEditedProduct });
       } else {
-        await this.$store.dispatch('ADD_PRODUCT', this.editedProduct);
+        await this.$store.dispatch('ADD_PRODUCT', newEditedProduct);
       }
       await this.$store.dispatch('GET_PRODUCTS');
       this.closeDialog();
